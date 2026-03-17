@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Secure Feedback App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 30px;
+            color: white;
+        }
+
+        .container {
+            max-width: 1250px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(10px);
+            border-radius: 28px;
+            padding: 36px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.22);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 42px;
+            margin-bottom: 28px;
+            font-weight: 700;
+        }
+
+        .section {
+            margin-bottom: 32px;
+            background: rgba(255, 255, 255, 0.10);
+            border-radius: 22px;
+            padding: 22px;
+        }
+
+        .section h2 {
+            font-size: 28px;
+            margin-bottom: 18px;
+            font-weight: 700;
+        }
+
+        .empty-text {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            padding: 6px 0;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 16px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255,255,255,0.08);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 16px 14px;
+            text-align: left;
+            font-size: 16px;
+        }
+
+        th {
+            background: rgba(255,255,255,0.13);
+            font-weight: 700;
+        }
+
+        tr {
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        tr:last-child {
+            border-bottom: none;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: none;
+            background: white;
+            color: #667eea;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            opacity: 0.88;
+        }
+
+        .bottom {
+            text-align: left;
+            margin-top: 8px;
+        }
+
+        .logout-btn {
+            padding: 12px 18px;
+            border-radius: 14px;
+            border: none;
+            background: rgba(255,255,255,0.18);
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.24);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 32px;
+            }
+
+            .section h2 {
+                font-size: 24px;
+            }
+
+            th, td {
+                padding: 12px 10px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Admin Panel</h1>
+
+    <!-- LOCKED ACCOUNTS -->
+    <div class="section">
+        <h2>Locked Accounts</h2>
+
+        <div th:if="${#lists.isEmpty(lockedUsers)}" class="empty-text">
+            No locked accounts.
+        </div>
+
+        <div th:if="${not #lists.isEmpty(lockedUsers)}" class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Failed Attempts</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="user : ${lockedUsers}">
+                        <td th:text="${user.id}"></td>
+                        <td th:text="${user.firstName + ' ' + user.lastName}"></td>
+                        <td th:text="${user.username}"></td>
+                        <td th:text="${user.email}"></td>
+                        <td th:text="${user.failedAttempts}"></td>
+                        <td>
+                            <form th:action="@{'/admin/unlock/' + ${user.id}}" method="post" style="display:inline;">
+                                <button type="submit" class="btn">Unlock</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ALL USERS -->
+    <div class="section">
+        <h2>All Users</h2>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Locked</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="user : ${users}">
+                        <td th:text="${user.id}"></td>
+                        <td th:text="${user.firstName + ' ' + user.lastName}"></td>
+                        <td th:text="${user.username}"></td>
+                        <td th:text="${user.email}"></td>
+                        <td th:text="${user.role}"></td>
+                        <td th:text="${user.accountLocked ? 'Yes' : 'No'}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ALL FEEDBACK -->
+    <div class="section">
+        <h2>All Feedback</h2>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Message</th>
+                        <th>Submitted At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="f : ${feedbackList}">
+                        <td th:text="${f.id}"></td>
+                        <td th:text="${f.name}"></td>
+                        <td th:text="${f.email}"></td>
+                        <td th:text="${f.message}"></td>
+                        <td th:text="${f.submittedAt}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="bottom">
+        <a th:href="@{/logout}" class="logout-btn">Logout</a>
+    </div>
+</div>
+
+</body>
+</html>
